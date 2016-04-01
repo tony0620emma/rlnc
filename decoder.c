@@ -35,6 +35,8 @@ void decoder_read_payload(struct decoder *decoder, uint8_t *payload_in)
 		decoder->data[msb] = payload;
 		decoder->state[msb] = vector;
 		decoder->rank++;
+	} else {
+		free(payload);
 	}
 
 	decoder->count++;
