@@ -78,6 +78,15 @@ void decoder_decode_block(struct decoder *decoder)
 	}
 }
 
+void decoder_flush(struct decoder *decoder)
+{
+	int32_t i;
+	for (i = 0; i < decoder->symbols; i++) {
+		memset(decoder->data[i], 0, decoder->symbol_size);
+	}
+	memset(decoder->block, 0, decoder->block_size);
+}
+
 void decoder_print(struct decoder *decoder)
 {
 	printf("decoder state :\n");
