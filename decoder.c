@@ -49,6 +49,7 @@ void decoder_print(struct decoder *decoder)
 	int32_t i, j;
 	for (i = decoder->symbols - 1; i >= 0; i--) {
 		mask = 0x80;
+		printf("%03d: ", decoder->symbols - i);
 		for (j = 0; j < decoder->symbols; j++) {
 			if (mask & decoder->state[i])
 				printf("1 ");
