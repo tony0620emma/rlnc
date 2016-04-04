@@ -31,6 +31,22 @@ struct encoder *encoder_create(uint32_t symbol_size)
 	return encoder;
 }
 
+void encoder_destroy(struct encoder **encoder_t)
+{
+	if (*encoder_t) {
+		if ((*encoder_t)->symbol) {
+			free((*encoder_t)->symbol);
+			(*encoder_t)->symbol = NULL;
+		}
+		if ((*encoder_t)->block) {
+			free((*encoder_t)->block);
+			(*encoder_t)->block = NULL;
+		}
+		free(*encoder_t);
+		*encoder_t = NULL;
+	}
+}
+
 void encoder_write_payload(struct encoder *encoder, uint8_t *payload_out)
 {
 	/* get the least significant 8 bits for vector randomly */

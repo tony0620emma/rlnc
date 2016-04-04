@@ -28,6 +28,33 @@ struct decoder *decoder_create(uint32_t symbol_size)
 	return decoder;
 }
 
+void decoder_destroy(struct decoder **decoder_t)
+{
+	int32_t i;
+	if (*decoder_t) {
+		if ((*decoder_t)->data) {
+			for (i = 0; i < (*decoder_t)->symbols; i++) {
+				if ((*decoder_t)->data[i]) {
+					free((*decoder_t)->data[i]);
+					(*decoder_t)->data[i] = NULL;
+				}
+			}
+			free((*decoder_t)->data);
+			(*decoder_t)->data = NULL;
+		}
+		if ((*decoder_t)->state) {
+			free((*decoder_t)->state);
+			(*decoder_t)->state = NULL;
+		}
+		if ((*decoder_t)->block) {
+			free((*decoder_t)->block);
+			(*decoder_t)->block = NULL;
+		}
+		free(*decoder_t);
+		*decoder_t = NULL;
+	}
+}
+
 void decoder_read_payload(struct decoder *decoder, uint8_t *payload_in)
 {
 	uint8_t *payload = (uint8_t *) calloc(decoder->symbol_size, sizeof(uint8_t));
@@ -82,7 +109,8 @@ void decoder_flush(struct decoder *decoder)
 {
 	int32_t i;
 	for (i = 0; i < decoder->symbols; i++) {
-		memset(decoder->data[i], 0, decoder->symbol_size);
+		free(decoder->data[i]);
+		decoder->data[i] = NULL;
 	}
 	memset(decoder->block, 0, decoder->block_size);
 }

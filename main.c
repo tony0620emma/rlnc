@@ -40,5 +40,8 @@ int main(int argc, char *argv[])
 	else
 		printf("decode fail\n");
 
+	free(payload);
+	decoder_destroy(&decoder);
+	encoder_destroy(&encoder);
 	return 0;
 }

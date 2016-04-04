@@ -12,4 +12,5 @@ struct encoder {
 };
 
 struct encoder *encoder_create(uint32_t symbol_size);
+void encoder_destroy(struct encoder **encoder_t);
 void encoder_write_payload(struct encoder *encoder, uint8_t *payload_out);
