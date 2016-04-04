@@ -12,20 +12,38 @@ static inline void exclusive_or(uint8_t *dst, uint8_t *src, size_t n)
         *dst++ ^= *src++;
 }
 
+struct encoder *encoder_create(uint32_t symbol_size)
+{
+	struct encoder *encoder;
+	encoder = (struct encoder *) calloc(1, sizeof(struct encoder));
+
+	/* TODO: implement more symbols support */
+	encoder->symbols = 8;
+	encoder->symbol_size = symbol_size;
+	encoder->block_size  = symbol_size * encoder->symbols;
+	encoder->block = (uint8_t *) calloc(encoder->block_size, sizeof(uint8_t));
+	encoder->symbol = (uint8_t **) calloc(encoder->symbols, sizeof(uint8_t *));
+	int32_t i;
+	uint8_t *mem = encoder->block;
+	for (i = 0; i < encoder->symbols; i++, mem += symbol_size) {
+		encoder->symbol[i] = mem;
+	}
+	return encoder;
+}
 
 void encoder_write_payload(struct encoder *encoder, uint8_t *payload_out)
 {
 	/* get the least significant 8 bits for vector randomly */
 	uint8_t vector = (uint8_t) rand();
 
-	/* set 0, and the 1 is for 8-bit vector */
+	/* clear memory, and the 1 is for 8-bit vector */
 	memset(payload_out, 0, encoder->symbol_size + 1);
 	
 	/* mask = 0b10000000 */
 	uint8_t mask = 0x80;
 
 	int32_t i;
-	for (i = encoder->symbols - 1; i >= 0; i--) {
+	for (i = 0; i < encoder->symbols; i++) {
 		if (vector & mask)
 			exclusive_or(payload_out, encoder->symbol[i], encoder->symbol_size);
 		mask >>= 1;

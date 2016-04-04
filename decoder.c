@@ -13,6 +13,21 @@ static inline void exclusive_or(uint8_t *dst, uint8_t *src, size_t n)
 		*dst++ ^= *src++;
 }
 
+struct decoder *decoder_create(uint32_t symbol_size)
+{
+	struct decoder *decoder;
+	decoder = (struct decoder *) calloc(1, sizeof(struct decoder));
+	
+	/* TODO: implement more symbols support */
+	decoder->symbols = 8;
+	decoder->symbol_size = symbol_size;
+	decoder->state = (uint8_t *) calloc(decoder->symbols, sizeof(uint8_t));
+	decoder->block_size = decoder->symbols * decoder->symbol_size;
+	decoder->block = (uint8_t *) calloc(decoder->block_size, sizeof(uint8_t));
+	decoder->data = (uint8_t **) calloc(decoder->symbols, sizeof(uint8_t *));
+	return decoder;
+}
+
 void decoder_read_payload(struct decoder *decoder, uint8_t *payload_in)
 {
 	uint8_t *payload = (uint8_t *) calloc(decoder->symbol_size, sizeof(uint8_t));
@@ -55,6 +70,11 @@ void decoder_decode_block(struct decoder *decoder)
 			}
 			mask <<= 1;
 		}
+	}
+	uint8_t *mem = decoder->block;
+	for (i = decoder->symbols - 1; i >= 0; i--) {
+		memcpy(mem, decoder->data[i], decoder->symbol_size);
+		mem += decoder->symbol_size;
 	}
 }
 
