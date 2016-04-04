@@ -42,6 +42,22 @@ void decoder_read_payload(struct decoder *decoder, uint8_t *payload_in)
 	decoder->count++;
 }
 
+void decoder_decode_block(struct decoder *decoder)
+{
+	uint32_t mask;
+	int32_t i, j;
+	for (i = 1; i < decoder->symbols; i++) {
+		mask = 0x1;
+		for (j = 0; j < i; j++) {
+			if (mask & decoder->state[i]) {
+				decoder->state[i] &= (~mask);
+				exclusive_or(decoder->data[i], decoder->data[j], decoder->symbol_size);
+			}
+			mask <<= 1;
+		}
+	}
+}
+
 void decoder_print(struct decoder *decoder)
 {
 	printf("decoder state :\n");
