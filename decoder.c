@@ -132,4 +132,5 @@ void decoder_print(struct decoder *decoder)
 		}
 		printf("\n");
 	}
+	printf("\n");
 }
