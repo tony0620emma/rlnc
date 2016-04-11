@@ -1,4 +1,4 @@
-CFLAGS = -g -O2 -Wall
+CFLAGS = -g -O2 -Wall -msse2 --std gnu99
 
 all: main
 
