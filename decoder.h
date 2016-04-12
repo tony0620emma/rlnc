@@ -23,3 +23,4 @@ void decoder_destroy(struct decoder **decoder_t);
 void decoder_read_payload(struct decoder *decoder, uint8_t *payload_in);
 void decoder_decode_block(struct decoder *decoder);
 void decoder_print(struct decoder *decoder);
+void decoder_flush(struct decoder *decoder);

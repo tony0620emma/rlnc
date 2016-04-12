@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <xmmintrin.h>
 
 #include "msb.h"
 #include "encoder.h"
@@ -8,8 +9,18 @@
 static inline void exclusive_or(uint8_t *dst, uint8_t *src, size_t n)
 {
     int i;
+#ifdef _XMMINTRIN_H_INCLUDED
+	/* Implement AVX/SIMD : xor 128-bits in one turn*/
+	for (i=0; i<n ; i=i+16) {
+		__m128i xmm1 = _mm_loadu_si128((__m128i *)(dst+i));
+		__m128i xmm2 = _mm_loadu_si128((__m128i *)(src+i));
+		xmm1 = _mm_xor_si128(xmm1, xmm2);
+		_mm_store_si128((__m128i *)(dst+i), xmm1);
+	}
+#else
     for (i = 0; i < n; i++)
         *dst++ ^= *src++;
+#endif
 }
 
 struct encoder *encoder_create(uint32_t symbol_size)

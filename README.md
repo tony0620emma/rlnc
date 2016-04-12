@@ -5,7 +5,7 @@ For now it only supports symbols = 8 (1 byte vector operation), and GF(2) field 
 
 Future Work
 -----------------
-* Implement AVX/SIMD support(or NEON on ARM platform)
+* Implement AVX/SIMD support(or NEON on ARM platform) -> OK
 * Support flexible number of symbols (only 8-bit vector available now)
 * Less memcpy function calls and less memory use
 * Object-Oriented API interface
