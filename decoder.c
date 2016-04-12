@@ -10,20 +10,18 @@
 static inline void exclusive_or(uint8_t *dst, uint8_t *src, size_t n)
 {
 	int i;
-	for (i = 0; i < n; i++)
-		*dst++ ^= *src++;
-}
-
-/* Implement AVX/SIMD : xor 128-bits in one turn*/
-static inline void exclusive_or_SIMD(uint8_t *dst, uint8_t *src, size_t n)
-{
-	int i;
-	for (i=0; i<n; i=i+16) {
+#ifdef _XMMINTRIN_H_INCLUDED
+	/* Implement AVX/SIMD : xor 128-bits in one turn*/
+	for (i=0; i<n ; i=i+16) {
 		__m128i xmm1 = _mm_loadu_si128((__m128i *)(dst+i));
 		__m128i xmm2 = _mm_loadu_si128((__m128i *)(src+i));
 		xmm1 = _mm_xor_si128(xmm1, xmm2);
 		_mm_store_si128((__m128i *)(dst+i), xmm1);
 	}
+#else
+	for (i = 0; i < n; i++)
+		*dst++ ^= *src++;
+#endif
 }
 
 struct decoder *decoder_create(uint32_t symbol_size)
@@ -82,8 +80,7 @@ void decoder_read_payload(struct decoder *decoder, uint8_t *payload_in)
 	/* the decoder state should be initialized to be 0 */
 	while (msb >= 0 && decoder->state[msb]) {
 		vector ^= decoder->state[msb];
-		//exclusive_or(payload, decoder->data[msb], decoder->symbol_size);
-		exclusive_or_SIMD(payload, decoder->data[msb], decoder->symbol_size);
+		exclusive_or(payload, decoder->data[msb], decoder->symbol_size);
 		msb = msb32(vector);
 	}
 
