@@ -5,7 +5,7 @@ export BUILD   = $(PWD)/build
 
 .PHONY: build example clean
 
-SUBDIR  = rlnc
+SUBDIR  = rlnc systematic
 
 all: build example
 

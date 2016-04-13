@@ -58,10 +58,17 @@ void encoder_destroy(struct encoder **encoder_t)
 	}
 }
 
-void encoder_write_payload(struct encoder *encoder, uint8_t *payload_out)
+void encoder_write_payload(struct encoder *encoder, uint8_t *payload_out, int order, int flag)
 {
-	/* get the least significant 8 bits for vector randomly */
-	uint8_t vector = (uint8_t) rand();
+	uint8_t vector;
+	if (flag) {	/* flag ==1, for systematic */
+		vector = 0x80;
+		vector >>= order;
+	}
+	else {		/* rlnc */
+		/* get the least significant 8 bits for vector randomly */
+		vector = (uint8_t) rand();
+	}
 
 	/* clear memory, and the 1 is for 8-bit vector */
 	memset(payload_out, 0, encoder->symbol_size + 1);

@@ -25,7 +25,7 @@ static double diff_in_second(struct timespec t1, struct timespec t2)
 
 int main(int argc, char *argv[])
 {
-	//srand(time(NULL));
+	srand(time(NULL));
 
 	struct timespec start, end;
 	double cpu_time = 0.0;
@@ -55,6 +55,20 @@ int main(int argc, char *argv[])
 
 		struct decoder *decoder = decoder_create(symbol_size);
 
+		/* systematic */
+		int o;
+		for (o = 0; o < encoder->symbols; o=o+2) {
+			/* with 75% probability to trigger systematic */
+			if ((rand() % 4) != 0) {
+				printf("%d\n", o);
+				encoder_write_payload(encoder, payload, o, 1);
+				decoder_read_payload(decoder, payload);
+				printf("decoder rank = %u\n", decoder->rank);
+				decoder_print(decoder);
+			}
+		}
+
+		/* rlnc */
 		while (decoder->rank < 8) {
 			encoder_write_payload(encoder, payload, 0, 0);
 			decoder_read_payload(decoder, payload);
