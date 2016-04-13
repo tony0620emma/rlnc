@@ -16,7 +16,7 @@ build:
 	$(MAKE) -C $(SOURCE) || exit 1;
 
 example: 
-	for n in $(SUBDIR); do $(MAKE) -C example/$$n OBJECT=$(wildcard $(BUILD)/*.o)|| exit 1; done
+	for n in $(SUBDIR); do $(MAKE) -C example/$$n OBJECT="$(wildcard $(BUILD)/*.o)"|| exit 1; done
 
 clean:
 	for n in $(SUBDIR); do $(MAKE) -C example/$$n clean; done
