@@ -1,11 +1,23 @@
-CFLAGS = -g -O2 -Wall -msse2 --std gnu99
+export CFLAGS := -g -O2 -Wall -msse2 --std gnu99
+export INCLUDE = $(PWD)/include
+export SOURCE  = $(PWD)/src
+export BUILD   = $(PWD)/build
 
-all: main
+.PHONY: build example clean
 
-main: main.c decoder.c encoder.c msb.c
-	$(CC) $(CFLAGS) -o $@ $^
+SUBDIR  = rlnc
 
-.PHONY: clean
+all: build example
+
+build:
+	if test ! -d build; then \
+		mkdir build; \
+	fi;
+	$(MAKE) -C $(SOURCE) || exit 1;
+
+example: 
+	for n in $(SUBDIR); do $(MAKE) -C example/$$n OBJECT=$(wildcard $(BUILD)/*.o)|| exit 1; done
 
 clean:
-	rm -rf main
+	for n in $(SUBDIR); do $(MAKE) -C example/$$n clean; done
+	rm -rf build
