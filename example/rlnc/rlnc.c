@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 		struct decoder *decoder = decoder_create(symbol_size);
 
 		while (decoder->rank < 8) {
-			encoder_write_payload(encoder, payload, 0, 0);
+			encoder_write_payload(encoder, payload);
 			decoder_read_payload(decoder, payload);
 			printf("decoder rank = %u\n", decoder->rank);
 			decoder_print(decoder);

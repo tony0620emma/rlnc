@@ -5,6 +5,7 @@
 
 #include "msb.h"
 #include "encoder.h"
+#include <stdio.h>
 
 static inline void exclusive_or(uint8_t *dst, uint8_t *src, size_t n)
 {
@@ -39,6 +40,7 @@ struct encoder *encoder_create(uint32_t symbol_size)
 	for (i = 0; i < encoder->symbols; i++, mem += symbol_size) {
 		encoder->symbol[i] = mem;
 	}
+	encoder->flags = 0;
 	return encoder;
 }
 
@@ -58,14 +60,18 @@ void encoder_destroy(struct encoder **encoder_t)
 	}
 }
 
-void encoder_write_payload(struct encoder *encoder, uint8_t *payload_out, int order, int flag)
+void encoder_write_payload(struct encoder *encoder, uint8_t *payload_out)
 {
 	uint8_t vector;
-	if (flag) {	/* flag ==1, for systematic */
+	if (encoder->flag) {	/* systematic */
+		printf("systematic\n");
 		vector = 0x80;
-		vector >>= order;
+		vector >>= encoder->flags;
+		encoder->flags ++;
+		if (encoder->flags >= encoder->symbols)
+			encoder->flags = 0;
 	}
-	else {		/* rlnc */
+	else {					/* rlnc */
 		/* get the least significant 8 bits for vector randomly */
 		vector = (uint8_t) rand();
 	}
@@ -75,7 +81,6 @@ void encoder_write_payload(struct encoder *encoder, uint8_t *payload_out, int or
 	
 	/* mask = 0b10000000 */
 	uint8_t mask = 0x80;
-
 	int32_t i;
 	for (i = 0; i < encoder->symbols; i++) {
 		if (vector & mask)

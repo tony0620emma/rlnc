@@ -57,11 +57,14 @@ int main(int argc, char *argv[])
 
 		/* systematic */
 		int o;
-		for (o = 0; o < encoder->symbols; o=o+2) {
+		for (o = 0; o < encoder->symbols; o++) {
+			encoder->flag = 1;
+			printf("flag : %d\n", encoder->flags);
+			encoder_write_payload(encoder, payload);
+
 			/* with 75% probability to trigger systematic */
 			if ((rand() % 4) != 0) {
 				printf("%d\n", o);
-				encoder_write_payload(encoder, payload, o, 1);
 				decoder_read_payload(decoder, payload);
 				printf("decoder rank = %u\n", decoder->rank);
 				decoder_print(decoder);
@@ -70,10 +73,11 @@ int main(int argc, char *argv[])
 
 		/* rlnc */
 		while (decoder->rank < 8) {
-			encoder_write_payload(encoder, payload, 0, 0);
+			encoder->flag = 0;
+			encoder_write_payload(encoder, payload);
 			decoder_read_payload(decoder, payload);
-			printf("decoder rank = %u\n", decoder->rank);
-			decoder_print(decoder);
+			//printf("decoder rank = %u\n", decoder->rank);
+			//decoder_print(decoder);
 		}
 
 		printf("\ndecoding block...\n\n");
