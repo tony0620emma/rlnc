@@ -39,6 +39,7 @@ struct encoder *encoder_create(uint32_t symbol_size)
 	for (i = 0; i < encoder->symbols; i++, mem += symbol_size) {
 		encoder->symbol[i] = mem;
 	}
+	encoder->counter = 0;
 	return encoder;
 }
 
@@ -60,15 +61,22 @@ void encoder_destroy(struct encoder **encoder_t)
 
 void encoder_write_payload(struct encoder *encoder, uint8_t *payload_out)
 {
-	/* get the least significant 8 bits for vector randomly */
-	uint8_t vector = (uint8_t) rand();
+	uint8_t vector;
+	if (encoder->flag) {	/* systematic */
+		vector = 0x80;
+		vector >>= (encoder->counter % 8);
+		encoder->counter ++;
+	}
+	else {					/* rlnc */
+		/* get the least significant 8 bits for vector randomly */
+		vector = (uint8_t) rand();
+	}
 
 	/* clear memory, and the 1 is for 8-bit vector */
 	memset(payload_out, 0, encoder->symbol_size + 1);
 	
 	/* mask = 0b10000000 */
 	uint8_t mask = 0x80;
-
 	int32_t i;
 	for (i = 0; i < encoder->symbols; i++) {
 		if (vector & mask)
