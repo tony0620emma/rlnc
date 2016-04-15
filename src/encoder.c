@@ -5,7 +5,6 @@
 
 #include "msb.h"
 #include "encoder.h"
-#include <stdio.h>
 
 static inline void exclusive_or(uint8_t *dst, uint8_t *src, size_t n)
 {
@@ -40,7 +39,7 @@ struct encoder *encoder_create(uint32_t symbol_size)
 	for (i = 0; i < encoder->symbols; i++, mem += symbol_size) {
 		encoder->symbol[i] = mem;
 	}
-	encoder->flags = 0;
+	encoder->counter = 0;
 	return encoder;
 }
 
@@ -64,12 +63,9 @@ void encoder_write_payload(struct encoder *encoder, uint8_t *payload_out)
 {
 	uint8_t vector;
 	if (encoder->flag) {	/* systematic */
-		printf("systematic\n");
 		vector = 0x80;
-		vector >>= encoder->flags;
-		encoder->flags ++;
-		if (encoder->flags >= encoder->symbols)
-			encoder->flags = 0;
+		vector >>= (encoder->counter % 8);
+		encoder->counter ++;
 	}
 	else {					/* rlnc */
 		/* get the least significant 8 bits for vector randomly */

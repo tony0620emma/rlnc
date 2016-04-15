@@ -59,12 +59,10 @@ int main(int argc, char *argv[])
 		int o;
 		for (o = 0; o < encoder->symbols; o++) {
 			encoder->flag = 1;
-			printf("flag : %d\n", encoder->flags);
 			encoder_write_payload(encoder, payload);
 
 			/* with 75% probability to trigger systematic */
 			if ((rand() % 4) != 0) {
-				printf("%d\n", o);
 				decoder_read_payload(decoder, payload);
 				printf("decoder rank = %u\n", decoder->rank);
 				decoder_print(decoder);

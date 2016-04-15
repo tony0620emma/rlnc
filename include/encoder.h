@@ -10,8 +10,8 @@ struct encoder {
 	uint32_t symbols;
 	uint32_t symbol_size;
 
-	uint32_t flag;
-	uint32_t flags;
+	uint32_t flag; /* detect network conding method */
+	uint32_t counter;
 };
 
 struct encoder *encoder_create(uint32_t symbol_size);
